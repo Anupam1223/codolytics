@@ -1,0 +1,4 @@
+type Repository {
+  id: ID!
+  name: String!
+}

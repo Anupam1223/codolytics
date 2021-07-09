@@ -1,0 +1,80 @@
+version: "3.3"
+services:
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: nginx.dockerfile
+    restart: always
+    volumes:
+      # - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - dhparam:/etc/ssl/certs
+    depends_on:
+      - db
+      - backend
+
+
+  db:
+    image: postgres:12
+    volumes:
+      - app-db-data:/var/lib/postgresql/data/pgdata
+      - app-db-data_backups:/backups:z
+    env_file:
+      - .env
+    environment:
+      - PGDATA=/var/lib/postgresql/data/pgdata
+
+  pgadmin:
+    image: dpage/pgadmin4
+    networks:
+      - default
+    depends_on:
+      - db
+    env_file:
+      - .env
+    tty: true
+  
+  backend:
+    image: '${DOCKER_IMAGE_BACKEND?Variable not set}:${TAG-latest}'
+    depends_on:
+      - db
+    env_file:
+      - .env
+    environment:
+      - SERVER_NAME=${DOMAIN?Variable not set}
+      - SERVER_HOST=https://${DOMAIN?Variable not set}
+      # Allow explicit env var override for tests
+      - SMTP_HOST=${SMTP_HOST}
+    # building container for backend present from dockerfile present inside backend 
+    build:
+      context: ./backend
+      dockerfile: backend.dockerfile
+      args:
+        INSTALL_DEV: ${INSTALL_DEV-false}
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - web-root:/var/www/html
+    depends_on:
+      - nginx
+    command: certonly --webroot --webroot-path=/var/www/html --email t.khatiwada@krispcall.com --agree-tos --no-eff-email --staging -d poc-api.codolytics.com
+
+volumes:
+  app-db-data:
+  app-db-data_backups:
+  certbot-etc:
+  certbot-var:
+  dhparam:
+  web-root:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./backend
+      o: bind
+

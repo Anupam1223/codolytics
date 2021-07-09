@@ -1,0 +1,6 @@
+type Query {
+  auth: User
+  user(id: ID!): User
+  projects: [Project]
+  repositories(projectId: ID): [Repository]
+}

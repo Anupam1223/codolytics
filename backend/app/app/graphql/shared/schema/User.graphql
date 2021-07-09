@@ -1,0 +1,7 @@
+type User {
+  id: ID!
+  email: String!
+  fullName: String
+  isActive: Boolean!
+#   isAdministrator: Boolean!
+}

@@ -1,0 +1,14 @@
+extend type Mutation {
+  addRepository(input: AddRepositoryInput!): AddRepositoryPayload
+}
+
+input AddRepositoryInput {
+  name: String!
+  project: ID!
+}
+
+type AddRepositoryPayload {
+  errors: [Error!]
+  success: Boolean
+  repository: Repository
+}

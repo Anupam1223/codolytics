@@ -1,0 +1,14 @@
+extend type Mutation {
+    addProject(input: AddProjectInput!): AddProjectPayload
+}
+
+input AddProjectInput {
+    name: String!
+    owner: ID!
+}
+
+type AddProjectPayload {
+    errors: [Error!]
+    success: Boolean
+    project: Project
+}
