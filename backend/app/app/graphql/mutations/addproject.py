@@ -39,6 +39,7 @@ async def resolve_add_project(_, info: GraphQLResolveInfo, *, input: dict):
         return {
             "errors": errors,
         }
+    print("cleaned data", cleaned_data)
     project = crud_project.create_project(info.context["db"], obj_in=cleaned_data)
     return {"project": project}
 

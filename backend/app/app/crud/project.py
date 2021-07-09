@@ -11,7 +11,11 @@ from ..schemas.project import ProjectCreate, ProjectUpdate
 class CRUDProject(CRUDBase[Project, ProjectCreate, ProjectUpdate]):
     def create_project(self, db: Session, *, obj_in: ProjectCreate) -> Project:
         obj_in_data = jsonable_encoder(obj_in)
-        db_obj = self.model(name=obj_in_data["name"], owner_id=obj_in_data["owner"])
+        print("obj_in_data", obj_in_data)
+        db_obj = self.model(
+            name=obj_in_data["name"], owner_id=obj_in_data["owner"]["id"]
+        )
+        print("db_obj", db_obj)
         db.add(db_obj)
         db.commit()
         # db.refresh_db(db_obj)

@@ -7,7 +7,7 @@ from ...validation import (
     validate_model,
     Validator,
     validate_data,
-    ProjectExistsValidator,
+    ProjectDoesNotExistsValidator,
     RepositoryNameExistsValidator,
 )
 from ..context import GraphQLContext
@@ -27,7 +27,7 @@ async def resolve_add_repository(_, info: GraphQLResolveInfo, *, input: dict):
     cleaned_data, errors = validate_model(input_model, input)
     if cleaned_data:
         validators: Dict[str, List[Validator]] = {
-            "project": [ProjectExistsValidator(info.context)],
+            "project": [ProjectDoesNotExistsValidator(info.context)],
             "name": [RepositoryNameExistsValidator()],
         }
         cleaned_data, errors = await validate_input_data(

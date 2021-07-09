@@ -11,7 +11,9 @@ from ..schemas.repository import RepositoryCreate, RepositoryUpdate
 class CRUDRepository(CRUDBase[Repository, RepositoryCreate, RepositoryUpdate]):
     def create_repository(self, db: Session, *, obj_in: RepositoryCreate) -> Repository:
         obj_in_data = jsonable_encoder(obj_in)
-        db_obj = self.model(name=obj_in_data["name"], project_id=obj_in_data["project"])
+        db_obj = self.model(
+            name=obj_in_data["name"], project_id=obj_in_data["project"]["id"]
+        )
         db.add(db_obj)
         db.commit()
         # db.refresh_db(db_obj)
