@@ -35,7 +35,9 @@ async def resolve_add_repository(_, info: GraphQLResolveInfo, *, input: dict):
         )
     if errors:
         return {"errors": errors}
-    repository = crud_repository.create_repository(obj_in=cleaned_data)
+    repository = crud_repository.create_repository(
+        info.context["db"], obj_in=cleaned_data
+    )
     return {"repository": repository, "success": True}
 
 

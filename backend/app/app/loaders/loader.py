@@ -22,8 +22,11 @@ def get_loader(
     coerce_id_to=parse_db_id,
 ) -> DataLoader:
     context_key = get_loader_context_key(name)
+    db = context["db"]
     if context_key not in context:
-        wrapped_loader_function = wrap_loader_function(loader_function, coerce_id_to)
+        wrapped_loader_function = wrap_loader_function(
+            loader_function, coerce_id_to, database=db
+        )
         # creating a new dataloader per request
         context[context_key] = DataLoader(wrapped_loader_function, get_cache_key=str)
     return context[context_key]
@@ -34,10 +37,10 @@ def get_loader_context_key(name: str) -> str:
 
 
 def wrap_loader_function(
-    loader_function: LoaderFunction,
-    coerce_id=parse_db_id,
+    loader_function: LoaderFunction, coerce_id=parse_db_id, **kwargs
 ) -> LoaderFunction:
     async def wrapped_loader_function(ids: Sequence[Any]) -> List[Any]:
+        db: Session = kwargs.get("database")
         data: Dict[str, Any] = {}
         graphql_ids = [str(i) for i in ids]
         internal_ids: List[Any] = []
@@ -49,7 +52,7 @@ def wrap_loader_function(
             else:
                 data[graphql_id] = None
         if internal_ids:
-            for item in await loader_function(ids=internal_ids):
+            for item in await loader_function(db, ids=internal_ids):
                 data[str(item.id)] = item
         return [data.get(i) for i in graphql_ids]
 

@@ -23,7 +23,7 @@ def resolve_auth(_, info: GraphQLResolveInfo) -> Awaitable[Optional[User]]:
 
 @query_type.field("projects")
 def resolve_projects(_, info: GraphQLResolveInfo) -> Awaitable[Optional[Project]]:
-    return crud_project.get_projects()
+    return crud_project.get_projects(info.context["db"])
 
 
 @query_type.field("repositories")
@@ -32,5 +32,7 @@ def resolve_repositories(
     _, info: GraphQLResolveInfo, *, project_id: Optional[str] = None
 ) -> Awaitable[Optional[Repository]]:
     if project_id:
-        return crud_repository.get_repository_by_project_id(project_id=project_id)
-    return crud_repository.get_repositories()
+        return crud_repository.get_repository_by_project_id(
+            info.context["db"], project_id=project_id
+        )
+    return crud_repository.get_repositories(info.context["db"])

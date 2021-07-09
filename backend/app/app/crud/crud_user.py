@@ -6,15 +6,17 @@ from ..core.security import get_password_hash, verify_password
 from ..crud.base import CRUDBase
 from ..models.user import User
 from ..schemas.user import UserCreate, UserUpdate
-from ..deps import get_db
+
+# from ..deps import get_db
 
 
 class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
     def get_by_email(self, db: Session, *, email: str) -> Optional[User]:
         return db.query(User).filter(User.email == email).first()
 
-    async def get_users_by_id(self, *, ids: Sequence[int]) -> Awaitable[List[User]]:
-        db = next(get_db())
+    async def get_users_by_id(
+        self, db: Session, *, ids: Sequence[int]
+    ) -> Awaitable[List[User]]:
         return db.query(User).filter(User.id.in_(ids)).all()
 
     def create(self, db: Session, *, obj_in: UserCreate) -> User:
