@@ -65,3 +65,5 @@ celerybeat-schedule
 nginx/fullchain.pem
 nginx/privkey.pem
 nginx/ssl-dhparams.pem
+
+logs/

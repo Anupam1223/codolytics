@@ -1,0 +1,31 @@
+extend type Query {
+  projectSummary: ProjectSummary
+  developerStatus: [DeveloperSummary]
+  commitActivities: [CommitActivity]
+}
+
+type ProjectSummary {
+  totalDevelopers: Int
+  activeDevelopers: Int
+  inactiveDevelopers: Int
+  totalCommits: Int
+}
+
+type DeveloperSummary {
+  author: String
+  sha: Int
+  insertion: Int
+  deletion: Int
+  totalLOC: Int
+}
+
+type CommitActivity {
+  totalCodingHours: Float
+  averageCodingHours: Float
+  totalAuthors: Int
+  filesChanged: Int
+  insertionCount: Float
+  deletionCount: Float
+  totalLines: Float
+  addDelRatio: Float
+}

@@ -1,6 +1,10 @@
 import os
 
-from ariadne import load_schema_from_path, make_executable_schema
+from ariadne import (
+    load_schema_from_path,
+    make_executable_schema,
+    snake_case_fallback_resolvers,
+)
 
 from .shared.scalars import shared_scalars
 from .shared.schema import shared_type_defs

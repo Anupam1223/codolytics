@@ -10,11 +10,6 @@ from ...crud import crud_project, crud_repository
 
 query_type = QueryType()
 
-repository_list = [
-    {"id": 1, "name": "Krispcall-Client"},
-    {"id": 2, "name": "Krispcall-API"},
-]
-
 
 @query_type.field("auth")
 def resolve_auth(_, info: GraphQLResolveInfo) -> Awaitable[Optional[User]]:
