@@ -51,6 +51,3 @@ async def graphiql(request: Request):
 async def graphql_post(request: Request, db: Session = Depends(get_db)):
     request.state.db = db
     return await graphql.graphql_http_server(request=request)
-
-
-# app.include_router(api_router, prefix=settings.API_V1_STR)

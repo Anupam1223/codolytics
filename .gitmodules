@@ -1,0 +1,3 @@
+[submodule "backend/app/app/gitdataminer"]
+	path = backend/app/app/gitdataminer
+	url = git@gitlab.com:codolytics/git-data-science.git
