@@ -5,12 +5,18 @@
 
 
 # BACKEND SETUP LOCALLY
-1. git clone clone_url(ssh is preferred)
-2. Start the stack with Docker Compose:
+1. git clone --recursive git@gitlab.com:codolytics/api-codolytics.git
+    Check if gitdataminer package exist in our main app folder(dashboard/app/app). If it does not have
+    source code inside it then run `git submodule update --init --recursive`
+
+2. Ask developer for env file which should be place adjacent to backend folder i.e just where the
+   docker-compose.yml file is. 
+
+3. Start the stack with Docker Compose:
     ```python
     docker-compose up -d
     ```
-3. Now you can open your browser and interact with these URLs:
+4. Now you can open your browser and interact with these URLs:
 
     #### Backend API - http://localhost:8888/graphql/
 
@@ -29,6 +35,9 @@
     ```python
     docker-compose logs backend
     ```
+
+NOTE: If you encountered any kind of issue, then please write it down the problem and solution either by creating an issue or wiki so that it will help other developers who faced similar issue. Your considerate nature is highly
+appreciable.
 
 ## GENERAL WORKFLOW
 By default, the dependencies are managed with Poetry.
