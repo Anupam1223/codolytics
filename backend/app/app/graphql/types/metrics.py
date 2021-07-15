@@ -52,3 +52,22 @@ def resolve_commit_activities(_, info: GraphQLResolveInfo):
         }
     ]
     return response
+
+
+@metrics_type.field("workLogs")
+def resolve_work_logs(_, info: GraphQLResolveInfo, after, before):
+    log_metrics = gitlogs.CommitAnalyzer("app/logs/react-git.log")
+    work_logs = log_metrics.commit_logs_per_day(after, before)
+    if len(work_logs):
+        result = [
+            #     key: group.reset_index(level=0, drop=True).to_dict(orient='index')
+            {
+                "author": key,
+                "commitInfo": group.to_dict(orient="records"),
+                "timestamp": [index[1] for index in list(group.index)],
+            }
+            for key, group in work_logs.groupby("author")
+        ]
+        print("result", result)
+        return result
+    return []

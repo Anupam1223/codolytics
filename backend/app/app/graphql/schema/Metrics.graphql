@@ -2,6 +2,7 @@ extend type Query {
   projectSummary: ProjectSummary
   developerStatus: [DeveloperSummary]
   commitActivities: [CommitActivity]
+  workLogs(after: String, before: String): [WorkLog]
 }
 
 type ProjectSummary {
@@ -28,4 +29,17 @@ type CommitActivity {
   deletionCount: Float
   totalLines: Float
   addDelRatio: Float
+}
+
+type WorkLog {
+  author: String
+  commitInfo: [CommitInfo]
+  timestamp: [DateTime]
+}
+
+type CommitInfo {
+  sha: Int
+  insertion: Int
+  deletion: Int
+  filepath: Int
 }
