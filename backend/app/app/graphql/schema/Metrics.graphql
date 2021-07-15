@@ -1,8 +1,8 @@
 extend type Query {
-  projectSummary(after: String, before: String): ProjectSummary
-  developerStatus(after: String, before: String): [DeveloperSummary]
-  commitActivities(after: String, before: String): [CommitActivity]
-  workLogs(after: String, before: String): [WorkLog]
+  projectSummary(after: DateTime, before: DateTime): ProjectSummary
+  developerStatus(after: DateTime, before: DateTime): [DeveloperSummary]
+  commitActivities(after: DateTime, before: DateTime): [CommitActivity]
+  workLogs(after: DateTime, before: DateTime): [WorkLog]
 }
 
 type ProjectSummary {
