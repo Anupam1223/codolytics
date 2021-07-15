@@ -26,7 +26,7 @@ class CRUDRepository(CRUDBase[Repository, RepositoryCreate, RepositoryUpdate]):
         return db.query(Repository).filter(Repository.id.in_(ids)).all()
 
     def get_repository_by_project_id(self, db: Session, *, project_id):
-        return db.query(Repository).filter(Repository.project_id == project_id).all()
+        return db.query(Repository).filter(Repository.project_id.in_(project_id)).all()
 
 
 repository = CRUDRepository(Repository)

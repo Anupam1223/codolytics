@@ -24,7 +24,7 @@ def resolve_projects(_, info: GraphQLResolveInfo) -> Awaitable[Optional[Project]
 @query_type.field("repositories")
 @convert_kwargs_to_snake_case
 def resolve_repositories(
-    _, info: GraphQLResolveInfo, *, project_id: Optional[str] = None
+    _, info: GraphQLResolveInfo, *, project_id: Optional[List[str]] = None
 ) -> Awaitable[Optional[Repository]]:
     if project_id:
         return crud_repository.get_repository_by_project_id(
