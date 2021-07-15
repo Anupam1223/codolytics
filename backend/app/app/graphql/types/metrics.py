@@ -11,10 +11,9 @@ metrics_type = QueryType()
 
 
 @metrics_type.field("projectSummary")
-def resolve_project_summary(_, info: GraphQLResolveInfo):
+def resolve_project_summary(_, info: GraphQLResolveInfo, after=None, before=None):
     log_metrics = gitlogs.CommitAnalyzer("app/logs/react-git.log")
-    project_summary = log_metrics.project_summary()
-    print("project_summary", project_summary)
+    project_summary = log_metrics.project_summary(after, before)
     return {
         "totalDevelopers": project_summary["total_developers"],
         "activeDevelopers": project_summary["total_developers"],
@@ -24,17 +23,17 @@ def resolve_project_summary(_, info: GraphQLResolveInfo):
 
 
 @metrics_type.field("developerStatus")
-def resolve_developer_status(_, info: GraphQLResolveInfo):
+def resolve_developer_status(_, info: GraphQLResolveInfo, after=None, before=None):
     log_metrics = gitlogs.CommitAnalyzer("app/logs/react-git.log")
-    author_summary = log_metrics.summary_of_each_author()
+    author_summary = log_metrics.summary_of_each_author(after, before)
     author_summary_json = author_summary.to_dict("records")
     return author_summary_json
 
 
 @metrics_type.field("commitActivities")
-def resolve_commit_activities(_, info: GraphQLResolveInfo):
+def resolve_commit_activities(_, info: GraphQLResolveInfo, after=None, before=None):
     log_metrics = gitlogs.CommitAnalyzer("app/logs/react-git.log")
-    commit_activities = log_metrics.commit_activity()
+    commit_activities = log_metrics.commit_activity(after, before)
     response = [
         {
             "totalCodingHours": commit_activities["total_coding_hours"],

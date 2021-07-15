@@ -9,6 +9,8 @@
     Check if gitdataminer package exist in our main app folder(dashboard/app/app). If it does not have
     source code inside it then run `git submodule update --init --recursive`
 
+    To get the updated version of gitdataminer you need to run `git submodule update --remote backend/app/app/gitdataminer`
+
 2. Ask developer for env file which should be place adjacent to backend folder i.e just where the
    docker-compose.yml file is. 
 
