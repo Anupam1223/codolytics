@@ -16,8 +16,8 @@ def resolve_project_summary(_, info: GraphQLResolveInfo, after=None, before=None
     project_summary = log_metrics.project_summary(after, before)
     return {
         "totalDevelopers": project_summary["total_developers"],
-        "activeDevelopers": project_summary["total_developers"],
-        "inactiveDevelopers": project_summary["total_developers"],
+        "activeDevelopers": project_summary["active_developers"],
+        "inactiveDevelopers": project_summary["inactive_developers"],
         "totalCommits": project_summary["total_commits"],
     }
 
