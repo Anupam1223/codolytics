@@ -11,9 +11,9 @@ metrics_type = QueryType()
 
 
 @metrics_type.field("projectSummary")
-def resolve_project_summary(_, info: GraphQLResolveInfo, after=None, before=None):
+async def resolve_project_summary(_, info: GraphQLResolveInfo, after=None, before=None):
     log_metrics = gitlogs.CommitAnalyzer("app/logs/react-git.log")
-    project_summary = log_metrics.project_summary(after, before)
+    project_summary = await log_metrics.project_summary(after, before)
     return {
         "totalDevelopers": project_summary["total_developers"],
         "activeDevelopers": project_summary["active_developers"],
@@ -23,17 +23,21 @@ def resolve_project_summary(_, info: GraphQLResolveInfo, after=None, before=None
 
 
 @metrics_type.field("developerStatus")
-def resolve_developer_status(_, info: GraphQLResolveInfo, after=None, before=None):
+async def resolve_developer_status(
+    _, info: GraphQLResolveInfo, after=None, before=None
+):
     log_metrics = gitlogs.CommitAnalyzer("app/logs/react-git.log")
-    author_summary = log_metrics.summary_of_each_author(after, before)
+    author_summary = await log_metrics.summary_of_each_author(after, before)
     author_summary_json = author_summary.to_dict("records")
     return author_summary_json
 
 
 @metrics_type.field("commitActivities")
-def resolve_commit_activities(_, info: GraphQLResolveInfo, after=None, before=None):
+async def resolve_commit_activities(
+    _, info: GraphQLResolveInfo, after=None, before=None
+):
     log_metrics = gitlogs.CommitAnalyzer("app/logs/react-git.log")
-    commit_activities = log_metrics.commit_activity(after, before)
+    commit_activities = await log_metrics.commit_activity(after, before)
     response = [
         {
             "totalCodingHours": commit_activities["total_coding_hours"],
@@ -54,9 +58,9 @@ def resolve_commit_activities(_, info: GraphQLResolveInfo, after=None, before=No
 
 
 @metrics_type.field("workLogs")
-def resolve_work_logs(_, info: GraphQLResolveInfo, after, before):
+async def resolve_work_logs(_, info: GraphQLResolveInfo, after, before):
     log_metrics = gitlogs.CommitAnalyzer("app/logs/react-git.log")
-    work_logs = log_metrics.commit_logs_per_day(after, before)
+    work_logs = await log_metrics.commit_logs_per_day(after, before)
     if len(work_logs):
         result = [
             #     key: group.reset_index(level=0, drop=True).to_dict(orient='index')
