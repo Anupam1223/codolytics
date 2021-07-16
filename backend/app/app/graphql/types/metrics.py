@@ -1,3 +1,7 @@
+import lzma
+import pandas as pd
+from datetime import timedelta
+
 from ariadne import QueryType
 from graphql import GraphQLResolveInfo
 
@@ -12,13 +16,29 @@ metrics_type = QueryType()
 
 @metrics_type.field("projectSummary")
 async def resolve_project_summary(_, info: GraphQLResolveInfo, after=None, before=None):
-    log_metrics = gitlogs.CommitAnalyzer("app/logs/react-git.log")
-    project_summary = await log_metrics.project_summary(after, before)
+    df = pd.read_pickle("app/logs/react-logs.xz")
+    if after is None or before is None:
+        today = pd.to_datetime("today", utc=True)
+        after = pd.to_datetime(today - timedelta(days=today.weekday()), utc=True)
+        before = pd.to_datetime(after + timedelta(days=6), utc=True)
+    filter_df = df[(df["date"] > after) & (df["date"] < before)]
+    active_developers = len(pd.unique(filter_df["author"]))
+    total_developers = len(pd.unique(df["author"]))
+    inactive_developers = total_developers - active_developers
+    total_commits = df["sha"].nunique()
+    # log_metrics = gitlogs.CommitAnalyzer("app/logs/react-git.log")
+    # project_summary = await log_metrics.project_summary(after, before)
+    # return {
+    #     "totalDevelopers": project_summary["total_developers"],
+    #     "activeDevelopers": project_summary["active_developers"],
+    #     "inactiveDevelopers": project_summary["inactive_developers"],
+    #     "totalCommits": project_summary["total_commits"],
+    # }
     return {
-        "totalDevelopers": project_summary["total_developers"],
-        "activeDevelopers": project_summary["active_developers"],
-        "inactiveDevelopers": project_summary["inactive_developers"],
-        "totalCommits": project_summary["total_commits"],
+        "totalDevelopers": total_developers,
+        "activeDevelopers": active_developers,
+        "inactiveDevelopers": inactive_developers,
+        "totalCommits": total_commits,
     }
 
 
@@ -59,18 +79,50 @@ async def resolve_commit_activities(
 
 @metrics_type.field("workLogs")
 async def resolve_work_logs(_, info: GraphQLResolveInfo, after, before):
-    log_metrics = gitlogs.CommitAnalyzer("app/logs/react-git.log")
-    work_logs = await log_metrics.commit_logs_per_day(after, before)
-    if len(work_logs):
-        result = [
-            #     key: group.reset_index(level=0, drop=True).to_dict(orient='index')
+    df = pd.read_pickle("app/logs/react-logs.xz")
+    if after is None or before is None:
+        today = pd.to_datetime("today", utc=True)
+        after = pd.to_datetime(today - timedelta(days=today.weekday()), utc=True)
+        before = pd.to_datetime(after + timedelta(days=6), utc=True)
+    filter_df = df[(df["date"] > after) & (df["date"] < before)]
+    if filter_df.size:
+        timed_commits = filter_df.set_index("date")
+        grouped = timed_commits.groupby(by=["author"])
+        resampled = grouped.resample("D").agg(
             {
-                "author": key,
-                "commitInfo": group.to_dict(orient="records"),
-                "timestamp": [index[1] for index in list(group.index)],
+                "sha": "size",
+                "insertion": "sum",
+                "deletion": "sum",
+                "filepath": "size",
             }
-            for key, group in work_logs.groupby("author")
-        ]
-        print("result", result)
-        return result
+        )
+        # need to convert it to dict
+        if resampled.size:
+            result = [
+                #     key: group.reset_index(level=0, drop=True).to_dict(orient='index')
+                {
+                    "author": key,
+                    "commitInfo": group.to_dict(orient="records"),
+                    "timestamp": [index[1] for index in list(group.index)],
+                }
+                for key, group in resampled.groupby("author")
+            ]
+            return result
+        else:
+            return []
     return []
+    # log_metrics = gitlogs.CommitAnalyzer("app/logs/react-git.log")
+    # work_logs = await log_metrics.commit_logs_per_day(after, before)
+    # if len(work_logs):
+    #     result = [
+    #         #     key: group.reset_index(level=0, drop=True).to_dict(orient='index')
+    #         {
+    #             "author": key,
+    #             "commitInfo": group.to_dict(orient="records"),
+    #             "timestamp": [index[1] for index in list(group.index)],
+    #         }
+    #         for key, group in work_logs.groupby("author")
+    #     ]
+    #     print("result", result)
+    #     return result
+    # return []
