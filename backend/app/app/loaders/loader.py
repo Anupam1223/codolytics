@@ -1,15 +1,16 @@
 import functools
 from asyncio import Future
-from typing import Callable, Sequence, Any, Awaitable, List, Dict
-
-# from fastapi import Depends
+from typing import Any, Awaitable, Callable, Dict, List, Sequence
 
 from aiodataloader import DataLoader
 from sqlalchemy.orm import Session
 
-from ..utils.strings import parse_db_id
 from ..graphql import GraphQLContext
-from ..deps import get_db
+from ..utils.strings import parse_db_id
+
+# from fastapi import Depends
+
+
 
 LoaderFunction = Callable[[Sequence[Any]], Awaitable[Sequence[Any]]]
 

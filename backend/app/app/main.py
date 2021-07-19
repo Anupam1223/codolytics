@@ -1,20 +1,21 @@
-from fastapi import FastAPI, Depends
-from starlette.requests import Request
+from ariadne.asgi import GraphQL
+from fastapi import Depends, FastAPI
+from sqlalchemy.orm import Session
+from starlette.datastructures import URL
 from starlette.middleware.cors import CORSMiddleware
+from starlette.requests import Request
+
+from .core.config import settings
+from .deps import get_db
+from .graphql import GraphQLContext
+from .graphql.context import get_graphql_context
+from .graphql.schema import schema
 
 # from starlette.middleware.authentication import AuthenticationMiddleware
 
-from starlette.datastructures import URL
 
 
-from ariadne.asgi import GraphQL
-from sqlalchemy.orm import Session
 
-from .graphql.context import get_graphql_context
-from .graphql import GraphQLContext
-from .graphql.schema import schema
-from .core.config import settings
-from .deps import get_db
 
 
 app = FastAPI(

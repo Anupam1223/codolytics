@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, Union, Sequence, Awaitable, List
+from typing import Any, Awaitable, Dict, List, Optional, Sequence, Union
 
 from sqlalchemy.orm import Session
 

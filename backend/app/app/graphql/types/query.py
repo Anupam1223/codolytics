@@ -3,10 +3,10 @@ from typing import Awaitable, List, Optional
 from ariadne import QueryType, convert_kwargs_to_snake_case
 from graphql import GraphQLResolveInfo
 
-from ...models.user import User
+from ...crud import crud_project, crud_repository
 from ...models.project import Project
 from ...models.repository import Repository
-from ...crud import crud_project, crud_repository
+from ...models.user import User
 
 query_type = QueryType()
 

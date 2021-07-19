@@ -1,7 +1,7 @@
 from typing import Any, Dict
 
-from starlette.requests import Request
 from sqlalchemy.orm import Session
+from starlette.requests import Request
 
 GraphQLContext = Dict[str, Any]
 

@@ -1,18 +1,18 @@
-from typing import Callable, Any, Union, Awaitable
+from typing import Any, Awaitable, Callable, Union
 
+from ..deps import get_db
 from ..errors import (
     ErrorsList,
     ProjectDoesNotExistError,
     ProjectExistsError,
-    UserDoesNotExistError,
     ProjectNameExistError,
     RepositoryNameExistError,
+    UserDoesNotExistError,
 )
-from ..loaders import load_user, load_project
 from ..graphql import GraphQLContext
+from ..loaders import load_project, load_user
 from ..models.project import Project
 from ..models.repository import Repository
-from ..deps import get_db
 
 Validator = Callable[[Any, ErrorsList, str], Union[Awaitable[Any], Any]]
 

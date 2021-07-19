@@ -1,20 +1,20 @@
-from typing import Dict, List, Tuple, Any
+from typing import Any, Dict, List, Tuple
 
 from ariadne import MutationType, convert_kwargs_to_snake_case
 from graphql import GraphQLResolveInfo
 
-from ...validation import (
-    validate_model,
-    Validator,
-    UserExistsValidator,
-    ProjectNameExistsValidator,
-    validate_data,
-)
-from ...errors import ErrorsList
-from ..errorhandler import error_handler
-from ...schemas import ProjectCreate
 from ...crud import crud_project
+from ...errors import ErrorsList
+from ...schemas import ProjectCreate
+from ...validation import (
+    ProjectNameExistsValidator,
+    UserExistsValidator,
+    Validator,
+    validate_data,
+    validate_model,
+)
 from .. import GraphQLContext
+from ..errorhandler import error_handler
 
 add_project_mutation = MutationType()
 

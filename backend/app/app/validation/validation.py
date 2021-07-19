@@ -1,22 +1,22 @@
 from asyncio import gather
 from inspect import isawaitable
 from typing import (
-    Tuple,
-    Type,
-    cast,
-    Dict,
     Any,
+    Awaitable,
+    Callable,
+    Dict,
     List,
     Optional,
-    Callable,
+    Tuple,
+    Type,
     Union,
-    Awaitable,
+    cast,
 )
 
 from pydantic import BaseModel, PydanticTypeError, PydanticValueError
 from pydantic import validate_model as pydantic_validate_model
 
-from ..errors import ErrorsList, AuthError
+from ..errors import AuthError, ErrorsList
 
 ROOT_LOCATION = ErrorsList.ROOT_LOCATION
 

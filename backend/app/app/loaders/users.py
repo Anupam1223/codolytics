@@ -1,8 +1,8 @@
-from typing import Awaitable, Optional, Union, Sequence
+from typing import Awaitable, Optional, Sequence, Union
 
+from ..crud import user
 from ..graphql import GraphQLContext
 from ..models.user import User
-from ..crud import user
 from .loader import get_loader
 
 

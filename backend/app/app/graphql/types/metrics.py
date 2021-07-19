@@ -1,11 +1,9 @@
-import lzma
+# import lzma
 import pandas as pd
-from datetime import timedelta
-
 from ariadne import QueryType
 from graphql import GraphQLResolveInfo
 
-from app.gitdataminer.src.gitdataminer import gitlogs
+from app.services.metrics import Metrics
 
 metrics_type = QueryType()
 
@@ -17,112 +15,39 @@ metrics_type = QueryType()
 @metrics_type.field("projectSummary")
 async def resolve_project_summary(_, info: GraphQLResolveInfo, after=None, before=None):
     df = pd.read_pickle("app/logs/react-logs.xz")
-    if after is None or before is None:
-        today = pd.to_datetime("today", utc=True)
-        after = pd.to_datetime(today - timedelta(days=today.weekday()), utc=True)
-        before = pd.to_datetime(after + timedelta(days=6), utc=True)
-    filter_df = df[(df["date"] > after) & (df["date"] < before)]
-    active_developers = len(pd.unique(filter_df["author"]))
-    total_developers = len(pd.unique(df["author"]))
-    inactive_developers = total_developers - active_developers
-    total_commits = df["sha"].nunique()
-    # log_metrics = gitlogs.CommitAnalyzer("app/logs/react-git.log")
-    # project_summary = await log_metrics.project_summary(after, before)
-    # return {
-    #     "totalDevelopers": project_summary["total_developers"],
-    #     "activeDevelopers": project_summary["active_developers"],
-    #     "inactiveDevelopers": project_summary["inactive_developers"],
-    #     "totalCommits": project_summary["total_commits"],
-    # }
+    metrics = Metrics(df)
+    project_summary = await metrics.project_summary(after, before)
     return {
-        "totalDevelopers": total_developers,
-        "activeDevelopers": active_developers,
-        "inactiveDevelopers": inactive_developers,
-        "totalCommits": total_commits,
+        "totalDevelopers": project_summary["total_developers"],
+        "activeDevelopers": project_summary["active_developers"],
+        "inactiveDevelopers": project_summary["inactive_developers"],
+        "totalCommits": project_summary["total_commits"],
     }
 
 
 @metrics_type.field("developerStatus")
-async def resolve_developer_status(
+async def resolve_summary_of_each_author(
     _, info: GraphQLResolveInfo, after=None, before=None
 ):
-    log_metrics = gitlogs.CommitAnalyzer("app/logs/react-git.log")
-    author_summary = await log_metrics.summary_of_each_author(after, before)
-    author_summary_json = author_summary.to_dict("records")
-    return author_summary_json
+    df = pd.read_pickle("app/logs/react-logs.xz")
+    metrics = Metrics(df)
+    developer_status = await metrics.summary_of_each_author(after, before)
+    return developer_status
 
 
 @metrics_type.field("commitActivities")
 async def resolve_commit_activities(
     _, info: GraphQLResolveInfo, after=None, before=None
 ):
-    log_metrics = gitlogs.CommitAnalyzer("app/logs/react-git.log")
-    commit_activities = await log_metrics.commit_activity(after, before)
-    response = [
-        {
-            "totalCodingHours": commit_activities["total_coding_hours"],
-            "averageCodingHours": commit_activities["average_coding_hours"],
-            "totalAuthors": commit_activities["total_authors"],
-            "filesChanged": commit_activities["files_changed"],
-            "insertionCount": commit_activities[
-                "insertion_count"
-            ],  # treated as productive for now
-            "deletionCount": commit_activities[
-                "deletion_count"
-            ],  # treated as unproductive for now
-            "totalLines": commit_activities["total_lines"],
-            "addDelRatio": commit_activities["add_del_ratio"],
-        }
-    ]
-    return response
+    df = pd.read_pickle("app/logs/react-logs.xz")
+    metrics = Metrics(df)
+    commit_activities = await metrics.commit_activities(after, before)
+    return [commit_activities]
 
 
 @metrics_type.field("workLogs")
 async def resolve_work_logs(_, info: GraphQLResolveInfo, after, before):
     df = pd.read_pickle("app/logs/react-logs.xz")
-    if after is None or before is None:
-        today = pd.to_datetime("today", utc=True)
-        after = pd.to_datetime(today - timedelta(days=today.weekday()), utc=True)
-        before = pd.to_datetime(after + timedelta(days=6), utc=True)
-    filter_df = df[(df["date"] > after) & (df["date"] < before)]
-    if filter_df.size:
-        timed_commits = filter_df.set_index("date")
-        grouped = timed_commits.groupby(by=["author"])
-        resampled = grouped.resample("D").agg(
-            {
-                "sha": "size",
-                "insertion": "sum",
-                "deletion": "sum",
-                "filepath": "size",
-            }
-        )
-        # need to convert it to dict
-        if resampled.size:
-            result = [
-                #     key: group.reset_index(level=0, drop=True).to_dict(orient='index')
-                {
-                    "author": key,
-                    "commitInfo": group.to_dict(orient="records"),
-                    "timestamp": [index[1] for index in list(group.index)],
-                }
-                for key, group in resampled.groupby("author")
-            ]
-            return result
-        else:
-            return []
-    return []
-    # log_metrics = gitlogs.CommitAnalyzer("app/logs/react-git.log")
-    # work_logs = await log_metrics.commit_logs_per_day(after, before)
-    # if len(work_logs):
-    #     result = [
-    #         #     key: group.reset_index(level=0, drop=True).to_dict(orient='index')
-    #         {
-    #             "author": key,
-    #             "commitInfo": group.to_dict(orient="records"),
-    #             "timestamp": [index[1] for index in list(group.index)],
-    #         }
-    #         for key, group in work_logs.groupby("author")
-    #     ]
-    #     print("result", result)
-    #     return result
-    # return []
+    metrics = Metrics(df)
+    work_logs = await metrics.work_logs(after, before)
+    return work_logs

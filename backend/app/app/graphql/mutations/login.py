@@ -1,12 +1,12 @@
-from pydantic import BaseModel, create_model, EmailStr
 from typing import Type
 
 from ariadne import MutationType
 from graphql import GraphQLResolveInfo
+from pydantic import BaseModel, EmailStr, create_model
 
-from ..errorhandler import error_handler
+from ...errors import AllFieldsAreRequiredError
 from .. import GraphQLContext
-from ...errors import AllFieldsAreRequiredError, InvalidCredentialsError
+from ..errorhandler import error_handler
 
 login_mutation = MutationType()
 LoginInputModel = Type[BaseModel]

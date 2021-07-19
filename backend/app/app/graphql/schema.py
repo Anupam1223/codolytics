@@ -1,15 +1,11 @@
 import os
 
-from ariadne import (
-    load_schema_from_path,
-    make_executable_schema,
-    snake_case_fallback_resolvers,
-)
+from ariadne import load_schema_from_path, make_executable_schema
 
+from .mutations import mutations
 from .shared.scalars import shared_scalars
 from .shared.schema import shared_type_defs
 from .shared.types import shared_types
-from .mutations import mutations
 from .types import types
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
