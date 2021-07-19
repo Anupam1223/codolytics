@@ -1,0 +1,63 @@
+image: tiangolo/docker-with-compose
+
+before_script:
+  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+  - pip install docker-auto-labels
+
+stages:
+  - build
+  - deploy
+
+build-stag:
+  stage: build
+  script:
+    - TAG=stag sh ./scripts/build-push.sh
+  only:
+    - main
+  tags:
+    - build
+    
+# build-prod:
+#   stage: build
+#   script:
+#     - TAG=prod FRONTEND_ENV=production sh ./scripts/build-push.sh
+#   only:
+#     - production
+#   tags:
+#     - build
+
+deploy-stag:
+  stage: deploy
+  script: 
+    - >
+      DOMAIN=poc-api.codolytics.com
+      TRAEFIK_TAG=poc-api.codolytics.com
+      STACK_NAME=stag-codolytics-com
+      TAG=stag
+      sh ./scripts/deploy.sh
+  environment:
+    name: staging
+    url: https://poc-api.codolytics.com
+  only:
+    - main
+  tags:
+    - swarm
+    - stag
+
+# deploy-prod:
+#   stage: deploy
+#   script:
+#     - >
+#       DOMAIN=codolytics.com
+#       TRAEFIK_TAG=codolytics.com
+#       STACK_NAME=codolytics-com
+#       TAG=prod
+#       sh ./scripts/deploy.sh
+#   environment:
+#     name: production
+#     url: https://codolytics.com
+#   only:
+#     - production
+#   tags:
+#     - swarm
+#     - prod
