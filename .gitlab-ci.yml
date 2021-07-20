@@ -20,7 +20,7 @@ build-stag:
 # build-prod:
 #   stage: build
 #   script:
-#     - TAG=prod FRONTEND_ENV=production sh ./scripts/build-push.sh
+#     - TAG=prod sh ./scripts/build-push.sh
 #   only:
 #     - production
 #   tags:
